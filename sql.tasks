@@ -64,3 +64,6 @@ ALTER TABLE `TABLE_NAME`
         # also with inplace convert to tuple
         args = ["a", "b", "c"]
         cur.execute('select x from y where z in %s',(tuple(args),))
+ 
+# recreate a user per db and give grants
+for db in `mysql -hlocalhost -uroot -ppassword -Bse "show databases" | grep -v 'sys\|_schema\|mysql\|tests\|tmp'` ; do db_pass=`mysql -hlocalhost -uroot -ppassword -Bse "select db_password from platform.configurations where db_username = '${db}' limit 1"`; mysql -hlocalhost -uroot -ppassword -Bse " create user ${db}@'%' identified by '${db_pass}'; grant all on ${db}.* to '${db}'@'%';grant all on ${db}_sqitch.* to '${db}'@'%'; flush privileges"; done
